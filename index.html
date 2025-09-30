@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+  <script type='text/javascript' src='//pl27753983.revenuecpmgate.com/f1/5e/c8/f15ec8cd50147a66f5ad92038b4786f7.js'></script>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Banonymous</title>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('https://images.ctfassets.net/nnkxuzam4k38/18zyrwm4RhrbpPIlIGVR2u/f21e0bb64d51cbb695ce89583ed8a439/blue-trianglify.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .logo {
+      font-family: 'Abril Fatface', cursive;
+      font-size: 2rem;
+      color: white;
+      margin-left: 20px;
+    }
+
+    .search-container {
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-container input {
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      background-color: white;
+      color: black;
+    }
+
+    .search-container button {
+      background: none;
+      border: none;
+      margin-left: 5px;
+      cursor: pointer;
+    }
+
+    .search-container img {
+      width: 20px;
+      height: 20px;
+      filter: brightness(0) invert(1);
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .video-card {
+      background-color: rgba(0, 0, 0, 0.45);
+      color: white;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+    }
+
+    .video-card:hover {
+      transform: scale(1.03);
+    }
+
+    .video-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    .video-card h3 {
+      margin: 10px 0 5px;
+    }
+
+    .get-content {
+      margin-top: 10px;
+      display: inline-block;
+      background-color: #ff4747;
+      color: white;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .get-content:hover {
+      background-color: #e63b3b;
+    }
+
+    .pagination {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .pagination button {
+      background-color: #ff4747;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 0 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pagination button.active {
+      background-color: #e63b3b;
+      font-size: 1.1em;
+      padding: 12px 18px;
+    }
+
+    .pagination button:hover {
+      background-color: #e63b3b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Banonymous</div>
+    <div class="search-container">
+      <input type="text" placeholder="Search..." id="search-input" onkeyup="filterVideos()" />
+      <button><img src="https://cdn-icons-png.flaticon.com/512/622/622669.png" alt="Search" /></button>
+    </div>
+  </header>
+
+  <div class="video-grid" id="video-grid"></div>
+  <div class="pagination" id="pagination"></div>
+
+  <script>
+    const API_KEY = "AIzaSyDIS90kSgJMljy4TyFBWJRIyq7nw58P9vc";
+    const CHANNEL_ID = "UC9bQJOZtWDuqSIxZOXuZnIQ";
+    const videosPerPage = 12;
+    const maxPages = 5;
+    let allVideos = [];
+    let currentPage = 1;
+
+    async function loadVideos() {
+      const cached = localStorage.getItem("cachedVideos");
+      const cacheTime = localStorage.getItem("cacheTimestamp");
+      const now = Date.now();
+
+      if (cached && cacheTime && now - cacheTime < 1000 * 60 * 60 * 24) {
+        allVideos = JSON.parse(cached);
+        renderVideos();
+        setupPagination();
+        return;
+      }
+
+      let newVideos = [];
+      let nextPageToken = "";
+      try {
+        for (let i = 0; i < maxPages; i++) {
+          const res = await fetch(`https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&channelId=${CHANNEL_ID}&part=snippet&maxResults=${videosPerPage}&order=date&type=video&pageToken=${nextPageToken}`);
+          const data = await res.json();
+          if (!data.items) break;
+          newVideos.push(...data.items.filter(item => item.id.kind === 'youtube#video'));
+          nextPageToken = data.nextPageToken || '';
+          if (!nextPageToken) break;
+        }
+        const existing = cached ? JSON.parse(cached) : [];
+        const existingIds = new Set(existing.map(v => v.id.videoId));
+        const combined = [...newVideos.filter(v => !existingIds.has(v.id.videoId)), ...existing];
+        allVideos = combined;
+        localStorage.setItem("cachedVideos", JSON.stringify(combined));
+        localStorage.setItem("cacheTimestamp", now.toString());
+        renderVideos();
+        setupPagination();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderVideos(filteredList = null) {
+      const grid = document.getElementById("video-grid");
+      grid.innerHTML = "";
+      const source = filteredList || allVideos;
+      const start = (currentPage - 1) * videosPerPage;
+      const end = start + videosPerPage;
+      const videosToShow = source.slice(start, end);
+
+      videosToShow.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+        card.innerHTML = `
+          <img src="${item.snippet.thumbnails.medium.url}" alt="${item.snippet.title}" />
+          <h3>${item.snippet.title}</h3>
+          <a href="video.html?videoId=${item.id.videoId}&title=${encodeURIComponent(item.snippet.title)}&desc=${encodeURIComponent(item.snippet.description)}" target="_blank" class="get-content">Get Content</a>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function setupPagination() {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
+      const totalPages = Math.ceil(allVideos.length / videosPerPage);
+      const maxDisplayed = 3;
+
+      let startPage, endPage;
+
+      if (totalPages <= maxDisplayed) {
+        startPage = 1;
+        endPage = totalPages;
+      } else {
+        if (currentPage <= 2) {
+          startPage = 1;
+          endPage = 3;
+        } else if (currentPage >= totalPages - 1) {
+          startPage = totalPages - 2;
+          endPage = totalPages;
+        } else {
+          startPage = currentPage - 1;
+          endPage = currentPage + 1;
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        if (i === currentPage) btn.classList.add("active");
+        btn.addEventListener("click", () => {
+          currentPage = i;
+          renderVideos();
+          setupPagination();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        pagination.appendChild(btn);
+      }
+    }
+
+    function filterVideos() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const filtered = allVideos.filter(video => video.snippet.title.toLowerCase().includes(query));
+      currentPage = 1;
+      renderVideos(filtered);
+      setupPagination();
+    }
+
+    loadVideos();
+  </script>
+</body>
+</html>
