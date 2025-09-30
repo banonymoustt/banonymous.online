@@ -1,0 +1,1 @@
+/v/:videoId    /video.html?videoId=:videoId    200
