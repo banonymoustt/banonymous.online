@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+  <script type='text/javascript' src='//pl27753983.effectivegatecpm.com/f1/5e/c8/f15ec8cd50147a66f5ad92038b4786f7.js'></script>   
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banonymous</title>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Playfair+Display:wght@500&family=Poppins:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Playfair Display', serif;
+      background: url('https://images.ctfassets.net/nnkxuzam4k38/18zyrwm4RhrbpPIlIGVR2u/f21e0bb64d51cbb695ce89583ed8a439/blue-trianglify.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      overflow-x: hidden;
+    }
+    header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    .logo {
+      font-family: 'Abril Fatface', cursive;
+      font-size: 2rem;
+      color: white;
+      margin-left: 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      background-color: rgba(0, 0, 0, 0.45);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 1;
+    }
+    .video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 ratio */
+  height: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.3);
+}
+
+.video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+    .video-title {
+      font-family: 'Abril Fatface', cursive;
+      font-size: 2.4rem;
+      margin-bottom: 20px;
+    }
+    .video-frame {
+      width: 100%;
+      height: 400px;
+      border: none;
+      border-radius: 15px;
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    .content-box {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 10px;
+      white-space: pre-line;
+      text-align: left;
+      font-size: 1.2rem;
+    }
+    .fatface-text {
+      font-family: 'Abril Fatface', cursive;
+    }
+    .get-script {
+      margin-top: 20px;
+      display: inline-block;
+      background-color: #ff4747;
+      color: white;
+      padding: 8px 16px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+      cursor: pointer;
+      font-size: 1rem;
+      text-transform: capitalize;
+    }
+    .get-script:hover {
+      background-color: #e63b3b;
+    }
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .popup {
+      background-color: rgba(20, 20, 20, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .popup *:not(.popup-footer) {
+      font-family: 'Poppins', sans-serif !important;
+      font-weight: 700;
+    }
+    .popup-title {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 4px black;
+      text-transform: capitalize;
+    }
+    .instruction {
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 4px black;
+    }
+    .instruction span.yellow {
+      color: yellow;
+    }
+    .task-btn-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background-color: #333;
+      border-radius: 12px;
+      padding: 15px 25px;
+      width: fit-content;
+      margin: 0 auto 20px;
+      cursor: pointer;
+    }
+    .task-btn-container:hover {
+      background-color: #444;
+    }
+    .task-btn {
+      background: none;
+      color: white;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: center;
+      padding: 10px 20px;
+    }
+    .task-help {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #555;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+    }
+    .task-help.spinner-mode {
+      border: 3px solid #1f3b75;
+      border-top: 3px solid transparent;
+      animation: spin 1s linear infinite;
+      color: transparent;
+    }
+    .task-help.completed {
+      animation: none;
+      background-color: #1f3b75;
+      border: 3px solid #1f3b75;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .unlock-btn {
+      margin-top: 10px;
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      border-radius: 12px;
+      cursor: not-allowed;
+      text-transform: capitalize;
+    }
+    .unlock-btn.active {
+      background-color: white;
+      color: #000;
+      cursor: pointer;
+    }
+    .progress {
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    .popup-footer {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      font-family: 'Abril Fatface', cursive;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Banonymous</div>
+  </header>
+  <div class="container">
+    <div class="video-title" id="video-title"></div>
+    <div id="video-frame" class="video-frame"></div>
+    <div class="section-title">Thanks for watching</div>
+    <div class="content-box fatface-text">We appreciate your support!</div>
+    <div class="section-title">Topics</div>
+    <div class="content-box fatface-text">Roblox Script, Best Roblox Script, Keyless Script, Free Script</div>
+    <div class="section-title">Script</div>
+    <button class="get-script" id="open-popup">Get Script</button>
+  </div>
+  <div class="popup-overlay" id="popup" style="display:none;">
+    <div class="popup" id="popup-content">
+      <div class="popup-title">Get Script</div>
+      <div class="instruction">Complete the action and <span class="yellow">unlock</span> script</div>
+      <div class="task-btn-container" onclick="startTask()">
+        <button class="task-btn">Complete Task</button>
+        <span class="task-help" id="helpIcon" onclick="toggleSpinner(this)">?</span>
+      </div>
+      <div class="progress" id="progress">Unlock Progress: 0/1</div>
+      <button class="unlock-btn" id="unlock-btn" disabled>Unlock Content</button>
+      <div class="popup-footer">Banonymous</div>
+    </div>
+  </div>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    let videoId = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    videoId = urlParams.get("videoId");
+
+    if (!videoId) {
+      const pathname = window.location.pathname;
+      const match = pathname.match(/\/v\/([a-zA-Z0-9_-]+)/);
+      if (match) {
+        videoId = match[1];
+      }
+    }
+
+    const title = urlParams.get('title');
+    const description = urlParams.get('desc') || "";
+
+    if (videoId) {
+const videoFrame = document.getElementById("video-frame");
+if (videoId) {
+  videoFrame.innerHTML = `
+    <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${videoId}" 
+    frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; 
+    gyroscope; picture-in-picture" allowfullscreen></iframe>
+  `;
+} else {
+  videoFrame.innerHTML = "<p>Video nije dostupan</p>";
+}
+
+if (title) {
+  document.getElementById("video-title").innerText = decodeURIComponent(title);
+} else {
+  const storedTitle = localStorage.getItem(`yt_title_${videoId}`);
+  if (storedTitle) {
+    document.getElementById("video-title").innerText = storedTitle;
+  } else {
+    fetch(`/getTitle.php?videoId=${videoId}`)
+      .then(response => response.json())
+      .then(data => {
+        const fetchedTitle = data?.title || "Video";
+        document.getElementById("video-title").innerText = fetchedTitle;
+        localStorage.setItem(`yt_title_${videoId}`, fetchedTitle);
+      })
+      .catch(error => {
+        console.error("Greška u preuzimanju naslova:", error);
+        document.getElementById("video-title").innerText = "Video";
+      });
+  }
+}
+
+    }
+
+let workink = "https://work.ink/1Wz2/default"; // fallback
+
+const woParam = urlParams.get("wo");
+if (woParam && woParam.startsWith("1Wz2/")) {
+  workink = `https://work.ink/${woParam}`;
+}
+
+    const adLink = "https://www.revenuecpmgate.com/y2w5m59e?key=985c90589943945cb923a283f062f80b";
+
+    document.getElementById("open-popup").onclick = () => {
+      document.getElementById("popup").style.display = "flex";
+    };
+
+    document.getElementById("popup").addEventListener("click", function (e) {
+      const popupContent = document.getElementById("popup-content");
+      if (!popupContent.contains(e.target)) {
+        document.getElementById("popup").style.display = "none";
+      }
+    });
+
+    window.startTask = function () {
+      window.open(adLink, '_blank');
+      toggleSpinner(document.getElementById("helpIcon"));
+      setTimeout(() => {
+        const helpIcon = document.getElementById("helpIcon");
+        helpIcon.classList.remove("spinner-mode");
+        helpIcon.classList.add("completed");
+        document.getElementById("progress").innerText = "Unlock Progress: 1/1";
+        const unlockBtn = document.getElementById("unlock-btn");
+        unlockBtn.disabled = false;
+        unlockBtn.classList.add("active");
+        unlockBtn.onclick = () => window.location.href = workink;
+      }, 10000);
+    };
+
+    window.toggleSpinner = function (el) {
+      el.innerText = "";
+      el.classList.add("spinner-mode");
+    };
+  });
+</script>
+
+
