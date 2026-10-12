@@ -724,7 +724,7 @@ async function getVideo(env, c, id, ctx, allowLookup) {
   //    Samo ako je poseta dosla sa linka iz opisa (?wo=) ili sa YouTube-a — botovi koji lupaju nasumicne ID-jeve ne trose API.
   const nf = MEM.notFound.get(id);
   if (nf && now - nf < MEM_NOTFOUND_TTL) return { rec: null, error: 'not found' };
-  if (!allowLookup) return { rec: null, error: 'not found' };
+  if (!allowLookup && !entry) return { rec: null, error: 'not found' }; // video sa nase liste: uvek smes da ga povuces
   try {
     const fresh = await fetchAndStoreVideo(env, c, id, ctx);
     if (!fresh) { if (MEM.notFound.size > 5000) MEM.notFound.clear(); MEM.notFound.set(id, now); }
