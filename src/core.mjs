@@ -51,6 +51,7 @@ const SETTINGS = {
   GATE_ENABLED: true,           // false = bez "Complete task" prozora
   GATE_SECONDS: 20,
   GATE_TASKS: 1,
+  SUBSCRIBE_URL: 'https://www.youtube.com/@BanonymousReborn', // dodatni task "Subscribe" (prazno = bez tog taska)
   ADBLOCK_WALL: true,           // false = bez "AdBlock detected" zida
   MAX_VIDEOS: 1200,
 };
@@ -148,6 +149,7 @@ function cfg(env) {
     gateEnabled: S.GATE_ENABLED !== false,
     gateSeconds: Math.max(1, Number(S.GATE_SECONDS) || 20),
     gateTasks: Math.max(1, Number(S.GATE_TASKS) || 1),
+    subscribeUrl: String(S.SUBSCRIBE_URL || '').trim(),
     adblockWall: S.ADBLOCK_WALL !== false,
     maxVideos: Math.max(50, Number(S.MAX_VIDEOS) || 1200),
   };
@@ -865,6 +867,11 @@ body.gate-open{overflow:hidden}
 .gate-task .spinner{display:none;position:absolute;right:14px;top:50%;width:18px;height:18px;margin-top:-9px;border:2.5px solid rgba(128,128,128,.35);border-top-color:${T.onAccent};border-radius:50%;animation:spin .8s linear infinite}
 .gate-task .spinner.on{display:block}
 .gate-task.done{filter:saturate(.6)}
+.gate-sub{background:#ff0033;color:#fff;box-shadow:0 10px 30px -14px #ff0033;display:flex;align-items:center;justify-content:center;gap:9px}
+.gate-sub svg{width:20px;height:20px;fill:#fff;flex:none}
+.gate-sub:hover{filter:brightness(1.08)}
+.gate-sub .spinner{border-color:rgba(255,255,255,.35);border-top-color:#fff}
+.gate-sub.done{background:#2a7a4b;box-shadow:none}
 @keyframes spin{to{transform:rotate(360deg)}}
 .gate-progress{font-size:12.5px;color:var(--text-faint);letter-spacing:.6px;text-transform:uppercase;font-weight:700}
 .gate-progress b{color:var(--text)}
@@ -985,8 +992,9 @@ const JS = `
   // ---------------- Get script prozor (zadatak + otkljucavanje) ----------------
   var gate = document.getElementById('gate'); var gs = document.querySelector('.get-script[data-gate]');
   if(gate && gs){
-    var target = gs.getAttribute('href'); var need = Number(S.gateTasks) || 1; var secs = Number(S.gateSeconds) || 20;
-    var running = false, done = 0;
+    var target = gs.getAttribute('href'); var adNeed = Number(S.gateTasks) || 1; var secs = Number(S.gateSeconds) || 20;
+    var subBtn = document.getElementById('gateSub'); var need = adNeed + (subBtn ? 1 : 0);
+    var running = false, done = 0, adDone = 0, subDone = false;
     var taskBtn = document.getElementById('gateTask'), taskLabel = document.getElementById('gateTaskLabel'), spin = document.getElementById('gateSpin');
     var prog = document.getElementById('gateProg'), unlock = document.getElementById('gateUnlock'), closeBtn = document.getElementById('gateClose');
     function openGate(){ gate.classList.add('open'); document.body.classList.add('gate-open'); mountAd(gate.querySelector('[data-ad]')); }
@@ -994,14 +1002,35 @@ const JS = `
     gs.addEventListener('click', function(e){ e.preventDefault(); openAd(); openGate(); });
     taskBtn.addEventListener('click', function(){
       openAd();
-      if(running || done >= need) return;
+      if(running || adDone >= adNeed) return;
       running = true; spin.classList.add('on'); taskLabel.textContent = 'Completing task…';
       setTimeout(function(){
-        running = false; done++; spin.classList.remove('on'); prog.textContent = done + '/' + need;
-        if(done >= need){ taskBtn.classList.add('done'); taskLabel.textContent = 'Task completed'; unlock.classList.add('ready'); unlock.setAttribute('aria-disabled', 'false'); }
-        else { taskLabel.textContent = 'Complete task ' + (done + 1) + '/' + need; }
+        running = false; adDone++; spin.classList.remove('on');
+        if(adDone >= adNeed){ taskBtn.classList.add('done'); taskLabel.textContent = 'Task completed'; }
+        else { taskLabel.textContent = 'Complete task ' + (adDone + 1) + '/' + adNeed; }
+        bump();
       }, secs * 1000);
     });
+    function bump(){
+      done = adDone + (subDone ? 1 : 0); prog.textContent = done + '/' + need;
+      if(done >= need){ unlock.classList.add('ready'); unlock.setAttribute('aria-disabled', 'false'); }
+    }
+    if(subBtn){
+      var subLabel = document.getElementById('gateSubLabel'), subSpin = document.getElementById('gateSubSpin');
+      var subUrl = subBtn.getAttribute('data-url'); subUrl += (subUrl.indexOf('?') < 0 ? '?' : '&') + 'sub_confirmation=1';
+      var subWaiting = false, leftAt = 0;
+      function subFinish(){ subWaiting = false; subDone = true; subSpin.classList.remove('on'); subBtn.classList.add('done'); subLabel.textContent = 'Subscribed ✓'; try { localStorage.setItem('subDone', '1'); } catch(e) {} bump(); }
+      try { if(localStorage.getItem('subDone') === '1'){ subFinish(); } } catch(e) {}
+      subBtn.addEventListener('click', function(){
+        if(subDone) return;
+        window.open(subUrl, '_blank', 'noopener');
+        if(subWaiting) return;
+        subWaiting = true; leftAt = Date.now(); subSpin.classList.add('on'); subLabel.textContent = 'Subscribe, then come back…';
+      });
+      // racuna se kad se posetilac vrati na sajt posle bar 5 sekundi na YouTube-u
+      function back(){ if(subWaiting && document.visibilityState === 'visible' && Date.now() - leftAt > 5000) subFinish(); }
+      document.addEventListener('visibilitychange', back); window.addEventListener('focus', back);
+    }
     unlock.addEventListener('click', function(){
       if(done < need){ unlock.classList.remove('shake'); void unlock.offsetWidth; unlock.classList.add('shake'); return; }
       openAd();
@@ -1092,7 +1121,8 @@ function gateMarkup(c) {
     (c.adsEnabled ? adSlot('gate') : '') +
     '<div class="gate-text">Complete action and unlock script</div>' +
     '<button class="cta gate-task" id="gateTask" type="button"><span id="gateTaskLabel">Complete task</span><span class="spinner" id="gateSpin"></span></button>' +
-    '<div class="gate-progress">Unlock progress: <b id="gateProg">0/' + c.gateTasks + '</b></div>' +
+    (c.subscribeUrl ? '<button class="cta gate-sub" id="gateSub" type="button" data-url="' + esc(c.subscribeUrl) + '"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg><span id="gateSubLabel">Subscribe to my channel</span><span class="spinner" id="gateSubSpin"></span></button>' : '') +
+    '<div class="gate-progress">Unlock progress: <b id="gateProg">0/' + (c.gateTasks + (c.subscribeUrl ? 1 : 0)) + '</b></div>' +
     '<button class="cta gate-unlock" id="gateUnlock" type="button" aria-disabled="true">' + ICON_DL + 'Unlock script</button>' +
     '</div></div>';
 }
